@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/main/api",
+    "build": "rimraf dist && npx tsc -p tsconfig-build.json",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +21,7 @@
   "dependencies": {
     "@types/module-alias": "^2.0.4",
     "@types/node": "^22.5.1",
+    "eslint-config-love": "^63.0.0",
     "module-alias": "^2.2.3",
     "rimraf": "^6.0.1"
   }

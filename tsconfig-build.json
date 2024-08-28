@@ -1,4 +1,6 @@
 {
+  "extends": "./tsconfig.json",
+  "exclude": ["tests"],
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
@@ -14,7 +16,8 @@
     },
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowDefaultProject": true
   },
   "include": ["src", "tests"]
 }
