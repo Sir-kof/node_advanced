@@ -13,7 +13,8 @@
     "test:staged": "npm t -- --findRelatedTests",
     "test:coverage": "npm t -- --coverage",
     "test:fb-api": "npm t -- -c ./jest.integration.config.js ./tests/external/facebook-api.test.ts",
-    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts"
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
   "description": "",
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "husky": "^9.1.5",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.9",
     "ts-jest": "^29.2.5",
