@@ -6,13 +6,23 @@
     "start": "node dist/main/api",
     "build": "rimraf dist && npx tsc -p tsconfig-build.json",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "test": "jest --passWithNoTests --no-cache --runInBand",
+    "test:watch": "npm t -- --watch",
+    "test:verbose": "jest --passWithNoTests --runInBand",
+    "test:staged": "npm t -- --findRelatedTests",
+    "test:coverage": "npm t -- --coverage",
+    "test:fb-api": "npm t -- -c ./jest.integration.config.js ./tests/external/facebook-api.test.ts",
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.5.4"
   },
   "engines": {
