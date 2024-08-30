@@ -90,7 +90,7 @@ describe('FacebookAuthenticationService', () => {
     expect(userAccountRepo.load).toHaveBeenCalledTimes(1)
   })
 
-  test('should create account wwith facebook data', async () => {
+  test('should create account with facebook data', async () => {
     await sut.perform({token})
 
     expect(userAccountRepo.saveWithFacebook).toHaveBeenCalledWith({
