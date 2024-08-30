@@ -2,7 +2,7 @@ import { LoadFacebookUserApi } from "@/data/contracts/apis"
 import { FacebookAuthenticationService } from "@/data/services"
 import { AuthenticationError } from "@/domain/errors"
 
-import { mock } from 'jest-mock-extended'
+import { mock, MockProxy } from 'jest-mock-extended'
 
 // class LoadFacebookUserApiSpy implements LoadFacebookUserApi {
 //   token?: string
@@ -15,14 +15,29 @@ import { mock } from 'jest-mock-extended'
 //   }
 // }
 
+type SutTypes ={
+  sut: FacebookAuthenticationService
+  loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
+}
+
+const makeSut = (): SutTypes => {
+  const loadFacebookUserApi = mock<LoadFacebookUserApi>()
+  const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+  return {
+    sut,
+    loadFacebookUserApi
+  }
+}
+
 describe('FacebookAuthenticationService', () => {
   test('should call loadFacebookUserApi with correct params', async () => {
     // const loadFacebookUserApi = new LoadFacebookUserApiSpy()
     // const loadFacebookUserApi = {
     //   loadUser: jest.fn()
     // }
-    const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-    const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+    // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
+    // const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+    const {sut, loadFacebookUserApi} = makeSut()
 
     await sut.perform({token: 'any_token'})
 
@@ -37,10 +52,11 @@ describe('FacebookAuthenticationService', () => {
     // const loadFacebookUserApi = {
     //   loadUser: jest.fn()
     // }
-    const loadFacebookUserApi = mock<LoadFacebookUserApi>()
+    // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
+    const {sut, loadFacebookUserApi} = makeSut()
     // loadFacebookUserApi.result = undefined
     loadFacebookUserApi.loadUser.mockResolvedValueOnce(undefined)
-    const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+    // const sut = new FacebookAuthenticationService(loadFacebookUserApi)
 
     const authResult = await sut.perform({token: 'any_token'})
 
