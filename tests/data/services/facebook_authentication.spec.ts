@@ -1,5 +1,5 @@
 import { LoadFacebookUserApi } from "@/data/contracts/apis"
-import { LoadUserAccountRepository } from "@/data/contracts/repos"
+import { CreateFacebookAccountRepository, LoadUserAccountRepository } from "@/data/contracts/repos"
 import { FacebookAuthenticationService } from "@/data/services"
 import { AuthenticationError } from "@/domain/errors"
 
@@ -33,6 +33,7 @@ import { mock, MockProxy } from 'jest-mock-extended'
 describe('FacebookAuthenticationService', () => {
   let loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
   let loadUserAccountRepo: MockProxy<LoadUserAccountRepository>
+  let createFacebookAccountRepo: MockProxy<CreateFacebookAccountRepository>
   let sut: FacebookAuthenticationService
   const token = 'any_token'
 
@@ -44,9 +45,11 @@ describe('FacebookAuthenticationService', () => {
       facebookId: 'any_fb_id',
     })
     loadUserAccountRepo = mock()
+    createFacebookAccountRepo = mock()
     sut = new FacebookAuthenticationService(
       loadFacebookUserApi,
-      loadUserAccountRepo
+      loadUserAccountRepo,
+      createFacebookAccountRepo
     )
   })
   test('should call loadFacebookUserApi with correct params', async () => {
@@ -87,5 +90,18 @@ describe('FacebookAuthenticationService', () => {
 
     expect(loadUserAccountRepo.load).toHaveBeenCalledWith({ email: 'any_fb_email'})
     expect(loadUserAccountRepo.load).toHaveBeenCalledTimes(1)
+  })
+
+  test('should call CreateUserAccountRepo when LoadFacebookUserApi returns undefined', async () => {
+    loadUserAccountRepo.load.mockResolvedValueOnce(undefined)
+
+    await sut.perform({token})
+
+    expect(createFacebookAccountRepo.createFromFacebook).toHaveBeenCalledWith({
+      name: 'any_fb_name',
+      email: 'any_fb_email',
+      facebookId: 'any_fb_id'
+    })
+    expect(createFacebookAccountRepo.createFromFacebook).toHaveBeenCalledTimes(1)
   })
 })
