@@ -15,21 +15,27 @@ import { mock, MockProxy } from 'jest-mock-extended'
 //   }
 // }
 
-type SutTypes ={
-  sut: FacebookAuthenticationService
-  loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
-}
+// type SutTypes ={
+//   sut: FacebookAuthenticationService
+//   loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
+// }
 
-const makeSut = (): SutTypes => {
-  const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-  const sut = new FacebookAuthenticationService(loadFacebookUserApi)
-  return {
-    sut,
-    loadFacebookUserApi
-  }
-}
+// const makeSut = (): SutTypes => {
+//   const loadFacebookUserApi = mock<LoadFacebookUserApi>()
+//   const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+//   return {
+//     sut,
+//     loadFacebookUserApi
+//   }
+// }
 
 describe('FacebookAuthenticationService', () => {
+  let loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
+  let sut: FacebookAuthenticationService
+  beforeEach(() => {
+    loadFacebookUserApi = mock()
+    sut = new FacebookAuthenticationService(loadFacebookUserApi)
+  })
   test('should call loadFacebookUserApi with correct params', async () => {
     // const loadFacebookUserApi = new LoadFacebookUserApiSpy()
     // const loadFacebookUserApi = {
@@ -37,7 +43,7 @@ describe('FacebookAuthenticationService', () => {
     // }
     // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
     // const sut = new FacebookAuthenticationService(loadFacebookUserApi)
-    const {sut, loadFacebookUserApi} = makeSut()
+    // const {sut, loadFacebookUserApi} = makeSut()
 
     await sut.perform({token: 'any_token'})
 
@@ -53,7 +59,7 @@ describe('FacebookAuthenticationService', () => {
     //   loadUser: jest.fn()
     // }
     // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-    const {sut, loadFacebookUserApi} = makeSut()
+    // const {sut, loadFacebookUserApi} = makeSut()
     // loadFacebookUserApi.result = undefined
     loadFacebookUserApi.loadUser.mockResolvedValueOnce(undefined)
     // const sut = new FacebookAuthenticationService(loadFacebookUserApi)
