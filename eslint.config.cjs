@@ -5,6 +5,7 @@ module.exports = [
     rules: {
       '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/return-await': 'off',
     },
   },
 ]
