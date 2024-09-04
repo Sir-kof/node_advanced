@@ -7,23 +7,30 @@ import { mock, MockProxy } from 'jest-mock-extended'
 class FacebookLoginController {
   constructor(private readonly facebookAuthentication: FacebookAuthentication) {}
   async handle(httpRequest: any): Promise<HttpResponse> {
-    if (httpRequest.token === '' || httpRequest.token === null || httpRequest.token === undefined)
-      return {
-        statusCode: 400,
-        data: new Error('The field token is required')
-      }
-    const result = await this.facebookAuthentication.perform({ token: httpRequest.token })
-    if (result instanceof AccessToken) {
-      return {
-        statusCode: 200,
-        data: {
-          accessToken: result.value
+    try {
+      if (httpRequest.token === '' || httpRequest.token === null || httpRequest.token === undefined)
+        return {
+          statusCode: 400,
+          data: new Error('The field token is required')
+        }
+      const result = await this.facebookAuthentication.perform({ token: httpRequest.token })
+      if (result instanceof AccessToken) {
+        return {
+          statusCode: 200,
+          data: {
+            accessToken: result.value
+          }
+        }
+      } else {
+        return {
+          statusCode: 401,
+          data: result
         }
       }
-    } else {
+    } catch (error: any) {
       return {
-        statusCode: 401,
-        data: result
+        statusCode: 500,
+        data: new ServerError(error)
       }
     }
   }
@@ -32,6 +39,14 @@ class FacebookLoginController {
 type HttpResponse = {
   statusCode: number
   data: any
+}
+
+class ServerError extends Error {
+  constructor (error?: Error) {
+    super('Server failed. Try again soon')
+    this.name = 'ServerError'
+    this.stack = error?.stack
+  }
 }
 
 describe('FacebookLoginController', () => {
@@ -75,8 +90,6 @@ describe('FacebookLoginController', () => {
   })
 
   test('should call FacebookAuthentication with correct params', async () => {
-    const facebookAuth = mock<FacebookAuthentication>()
-    sut = new FacebookLoginController(facebookAuth)
     const httpResponse = await sut.handle({ token: 'any_token' })
 
     expect(facebookAuth.perform).toHaveBeenCalledWith({
@@ -93,6 +106,17 @@ describe('FacebookLoginController', () => {
       data: {
         accessToken: 'any_value'
       }
+    })
+  })
+
+  test('should return 500 if authentication throws', async () => {
+    const error = new Error('infra_error')
+    facebookAuth.perform.mockRejectedValueOnce(error)
+    const httpResponse = await sut.handle({ token: 'any_token' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 500,
+      data: new ServerError()
     })
   })
 })
