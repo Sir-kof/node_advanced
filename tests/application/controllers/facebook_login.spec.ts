@@ -1,5 +1,5 @@
 import { FacebookLoginController } from "@/application/controllers"
-import { RequiredFieldError, ServerError, UnauthorizedError } from "@/application/errors"
+import { ServerError, UnauthorizedError } from "@/application/errors"
 import { RequiredStringValidator } from "@/application/validation"
 import { AuthenticationError } from "@/domain/errors"
 import { FacebookAuthentication } from "@/domain/features"
