@@ -13,4 +13,11 @@ export class RequiredFieldError extends Error {
   }
 }
 
+export class UnauthorizedError extends Error {
+  constructor () {
+    super(`Unauthorized`)
+    this.name = 'UnauthorizedError'
+  }
+}
+
 new Error('The field token is required')

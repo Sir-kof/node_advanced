@@ -1,5 +1,6 @@
 import { FacebookLoginController } from "@/application/controllers"
-import { RequiredFieldError, ServerError } from "@/application/errors"
+import { RequiredFieldError, ServerError, UnauthorizedError } from "@/application/errors"
+import { AuthenticationError } from "@/domain/errors"
 import { FacebookAuthentication } from "@/domain/features"
 import { AccessToken } from "@/domain/models"
 
@@ -52,6 +53,16 @@ describe('FacebookLoginController', () => {
       token: 'any_token'
     })
     expect(facebookAuth.perform).toHaveBeenCalledTimes(1)
+  })
+
+  test('should return 401 if authentication fails', async () => {
+    facebookAuth.perform.mockResolvedValueOnce(new AuthenticationError())
+    const httpResponse = await sut.handle({ token: 'any_token' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 401,
+      data: new UnauthorizedError()
+    })
   })
 
   test('should return 200 if authentication succeeds', async () => {
