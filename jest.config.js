@@ -19,12 +19,3 @@ module.exports = {
   },
   clearMocks: true
 }
-
-// const config = {
-//   collectCoverage: true,
-//   collectCoverageFrom: ['<rootDir>'],
-//   coverageDirectory: "coverage",
-//   coverageProvider: "babel",
-// };
-
-// module.exports = config;
