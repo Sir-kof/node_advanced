@@ -1,7 +1,1 @@
-export * from './comments'
-export * from './company'
-export * from './favorite'
-export * from './images'
-export * from './product'
 export * from './user'
-export * from './user-profile'

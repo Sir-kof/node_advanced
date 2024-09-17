@@ -28,10 +28,17 @@ export class FacebookApi implements LoadFacebookUserApi {
 
   async loadUser(params: LoadFacebookUserApi.Params): Promise<LoadFacebookUserApi.Result> {
     try {
-      // const userInfo = await this.getUserInfo(params.token)
+      // console.log(await this.getUserInfo(params.token))
       return this.getUserInfo(params.token)
-        .then(({ facebookId, name, email }) => ({ facebookId, name, email }))
-        .catch(() => undefined)
+        .then(userInfo => {
+          console.log('email',userInfo.email)
+          console.log(userInfo)
+          return { facebookId: userInfo.facebookId, name: userInfo.name, email: userInfo.email }
+      })
+        .catch((e) => {
+          console.error('retornou erro ao chamar', e)
+          return undefined
+        })
       // return {
       //   facebookId: '100667956249300',
       //   email: 'rodrigo_mkbekkn_fernandes@tfbnw.net',
@@ -66,12 +73,14 @@ export class FacebookApi implements LoadFacebookUserApi {
 
   private async getUserInfo(clientToken: string): Promise<UserInfo> {
     const debugToken = await this.getDebugToken(clientToken)
-    return this.httpClient.get({
+    const fieldsRequest = ['id', 'name', 'email'].join(',')
+    const userInfo = await this.httpClient.get({
       url: `${this.baseUrl}/${debugToken.data.user_id}`,
       params: {
-        fields: ['id', 'name', 'email'].join(','),
+        fields: fieldsRequest,
         access_token: clientToken,
       }
     })
+    return userInfo
   }
 }
