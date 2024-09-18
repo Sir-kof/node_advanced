@@ -1,4 +1,3 @@
-import { LoadFacebookUserApi } from "@/data/contracts/apis"
 import { FacebookApi } from "@/infra/apis"
 import { HttpGetClient } from "@/infra/http"
 

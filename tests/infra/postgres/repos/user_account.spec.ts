@@ -1,16 +1,16 @@
 import "reflect-metadata";
-import { LoadUserAccountRepository } from "@/data/contracts/repos"
+import { LoadUserAccountRepository } from "@/domain/contracts/repos"
 
-import { DataSource } from "typeorm"
-import { PgUser } from "@/infra/postgres/entities/pguser";
+// import { DataSource } from "typeorm"
+// import { PgUser } from "@/infra/postgres/entities/pguser";
 import { AppDataSource } from "../../../../src/ormconfig";
 
 class PgUserAccountRepository {
   async load(params: LoadUserAccountRepository.Params): Promise<void> {
-    console.log('|||||||||||||||||||||||||||')
-    console.log('|||||||||||||||||||||||||||')
-    console.log('|||||||||||||||||||||||||||')
-    console.log(AppDataSource.entityMetadatas);
+    // console.log('|||||||||||||||||||||||||||')
+    // console.log('|||||||||||||||||||||||||||')
+    // console.log('|||||||||||||||||||||||||||')
+    // console.log(AppDataSource.entityMetadatas);
     // const pgUserRepo = AppDataSource.getRepository(PgUser)
     // const pgUser = await pgUserRepo.findOne({ where: { email: params.email } })
     // if (pgUser != undefined) {
@@ -44,7 +44,7 @@ describe('PgUserAccountRepository', () => {
 
   describe('load', () => {
     test('should return an account if email exists', async () => {
-      console.log(AppDataSource.entityMetadatas);
+      // console.log(AppDataSource.entityMetadatas);
       // const pgUserRepo = got.getRepository(PgUser)
       // await pgUserRepo.save({ email: 'existing_email' })
 

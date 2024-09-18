@@ -1,9 +1,9 @@
-import { LoadFacebookUserApi } from "@/data/contracts/apis"
-import { TokenGenerator } from "@/data/contracts/crypto"
-import { LoadUserAccountRepository, SaveFacebookAccountRepository } from "@/data/contracts/repos"
-import { FacebookAuthenticationService } from "@/data/services"
-import { AuthenticationError } from "@/domain/errors"
-import { AccessToken, FacebookAccount } from "@/domain/models"
+import { LoadFacebookUserApi } from "@/domain/contracts/apis"
+import { TokenGenerator } from "@/domain/contracts/crypto"
+import { LoadUserAccountRepository, SaveFacebookAccountRepository } from "@/domain/contracts/repos"
+import { setupFacebookAuthentication, FacebookAuthentication } from '@/domain/use_cases'
+import { AuthenticationError } from "@/domain/entities/errors"
+import { AccessToken, FacebookAccount } from "@/domain/entities"
 
 import { mock, MockProxy } from 'jest-mock-extended'
 
@@ -19,26 +19,26 @@ import { mock, MockProxy } from 'jest-mock-extended'
 // }
 
 // type SutTypes ={
-//   sut: FacebookAuthenticationService
+//   sut: FacebookAuthentication
 //   loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
 // }
 
 // const makeSut = (): SutTypes => {
 //   const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-//   const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+//   const sut = new FacebookAuthentication(loadFacebookUserApi)
 //   return {
 //     sut,
 //     loadFacebookUserApi
 //   }
 // }
 
-jest.mock('@/domain/models/facebook_account')
+jest.mock('@/domain/entities/facebook_account')
 
-describe('FacebookAuthenticationService', () => {
+describe('FacebookAuthentication', () => {
   let facebookApi: MockProxy<LoadFacebookUserApi>
   let crypto: MockProxy<TokenGenerator>
   let userAccountRepo: MockProxy<LoadUserAccountRepository & SaveFacebookAccountRepository>
-  let sut: FacebookAuthenticationService
+  let sut: FacebookAuthentication
   let token: string
 
   beforeAll(() => {
@@ -57,7 +57,7 @@ describe('FacebookAuthenticationService', () => {
   })
 
   beforeEach(() => {
-    sut = new FacebookAuthenticationService(
+    sut = setupFacebookAuthentication(
       facebookApi,
       userAccountRepo,
       crypto
@@ -69,10 +69,10 @@ describe('FacebookAuthenticationService', () => {
     //   loadUser: jest.fn()
     // }
     // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-    // const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+    // const sut = new FacebookAuthentication(loadFacebookUserApi)
     // const {sut, loadFacebookUserApi} = makeSut()
 
-    await sut.perform({token})
+    await sut({token})
 
     expect(facebookApi.loadUser).toHaveBeenCalledWith({ token })
     expect(facebookApi.loadUser).toHaveBeenCalledTimes(1)
@@ -89,15 +89,15 @@ describe('FacebookAuthenticationService', () => {
     // const {sut, loadFacebookUserApi} = makeSut()
     // loadFacebookUserApi.result = undefined
     facebookApi.loadUser.mockResolvedValueOnce(undefined)
-    // const sut = new FacebookAuthenticationService(loadFacebookUserApi)
+    // const sut = new FacebookAuthentication(loadFacebookUserApi)
 
-    const authResult = await sut.perform({token})
+    const authResult = await sut({token})
 
     expect(authResult).toEqual(new AuthenticationError)
   })
 
   test('should call LoadUserAccountRepo when LoadFacebookUserApi returns data', async () => {
-    await sut.perform({token})
+    await sut({token})
 
     expect(userAccountRepo.load).toHaveBeenCalledWith({ email: 'any_fb_email'})
     expect(userAccountRepo.load).toHaveBeenCalledTimes(1)
@@ -106,14 +106,14 @@ describe('FacebookAuthenticationService', () => {
   test('should call SaveFacebookAccountRepository with FacebookAccount', async () => {
     const FacebookAccountStub = jest.fn().mockImplementation(() => ({ any: 'any'}))
     jest.mocked(FacebookAccount).mockImplementation(FacebookAccountStub)
-    await sut.perform({token})
+    await sut({token})
 
     expect(userAccountRepo.saveWithFacebook).toHaveBeenCalledWith({ any: 'any'})
     expect(userAccountRepo.saveWithFacebook).toHaveBeenCalledTimes(1)
   })
 
   test('should call TokenGenerator with correct params', async () => {
-    await sut.perform({token})
+    await sut({token})
 
     expect(crypto.generateToken).toHaveBeenCalledWith({
       key: 'any_account_id',
@@ -123,7 +123,7 @@ describe('FacebookAuthenticationService', () => {
   })
 
   test('should return an AccessToken on success', async () => {
-    const authResult = await sut.perform({token})
+    const authResult = await sut({token})
 
     expect(authResult).toEqual(new AccessToken('any_generated_token'))
   })
@@ -131,7 +131,7 @@ describe('FacebookAuthenticationService', () => {
   test('should rethrow if LoadFacebookUserApi throws', async () => {
     facebookApi.loadUser.mockRejectedValueOnce(new Error('fb_error'))
 
-    const promise = sut.perform({token})
+    const promise = sut({token})
 
     await expect(promise).rejects.toThrow(new Error('fb_error'))
   })
@@ -139,7 +139,7 @@ describe('FacebookAuthenticationService', () => {
   test('should rethrow if LoadUserAccountRepository throws', async () => {
     userAccountRepo.load.mockRejectedValueOnce(new Error('load_error'))
 
-    const promise = sut.perform({token})
+    const promise = sut({token})
 
     await expect(promise).rejects.toThrow(new Error('load_error'))
   })
@@ -147,7 +147,7 @@ describe('FacebookAuthenticationService', () => {
   test('should rethrow if SaveFacebookAccountRepository throws', async () => {
     userAccountRepo.saveWithFacebook.mockRejectedValueOnce(new Error('save_error'))
 
-    const promise = sut.perform({token})
+    const promise = sut({token})
 
     await expect(promise).rejects.toThrow(new Error('save_error'))
   })
@@ -155,7 +155,7 @@ describe('FacebookAuthenticationService', () => {
   test('should rethrow if TokenGenerator throws', async () => {
     crypto.generateToken.mockRejectedValueOnce(new Error('token_error'))
 
-    const promise = sut.perform({token})
+    const promise = sut({token})
 
     await expect(promise).rejects.toThrow(new Error('token_error'))
   })
