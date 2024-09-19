@@ -1,3 +1,5 @@
+new Error('The field token is required')
+
 export class ServerError extends Error {
   constructor (error?: Error) {
     super('Server failed. Try again soon')
@@ -20,4 +22,10 @@ export class UnauthorizedError extends Error {
   }
 }
 
-new Error('The field token is required')
+export class ForbiddenError extends Error {
+  constructor () {
+    super(`Access denied`)
+    this.name = 'ForbiddenError'
+  }
+}
+
