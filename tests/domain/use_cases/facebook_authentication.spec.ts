@@ -1,17 +1,16 @@
-import { LoadFacebookUserApi } from "@/domain/contracts/apis"
-import { TokenGenerator } from "@/domain/contracts/crypto"
-import { LoadUserAccountRepository, SaveFacebookAccountRepository } from "@/domain/contracts/repos"
+import { LoadFacebookUser, TokenGenerator } from "@/domain/contracts/gateways"
+import { LoadUserAccount, SaveFacebookAccount } from "@/domain/contracts/repos"
 import { setupFacebookAuthentication, FacebookAuthentication } from '@/domain/use_cases'
 import { AuthenticationError } from "@/domain/entities/errors"
 import { AccessToken, FacebookAccount } from "@/domain/entities"
 
 import { mock, MockProxy } from 'jest-mock-extended'
 
-// class LoadFacebookUserApiSpy implements LoadFacebookUserApi {
+// class LoadFacebookUserSpy implements LoadFacebookUser {
 //   token?: string
 //   callsCount = 0
 //   result = undefined
-//   async loadUser(params: LoadFacebookUserApi.Params): Promise<LoadFacebookUserApi.Result> {
+//   async loadUser(params: LoadFacebookUser.Params): Promise<LoadFacebookUser.Result> {
 //     this.token = params.token
 //     this.callsCount++
 //     return this.result
@@ -20,24 +19,24 @@ import { mock, MockProxy } from 'jest-mock-extended'
 
 // type SutTypes ={
 //   sut: FacebookAuthentication
-//   loadFacebookUserApi: MockProxy<LoadFacebookUserApi>
+//   LoadFacebookUser: MockProxy<LoadFacebookUser>
 // }
 
 // const makeSut = (): SutTypes => {
-//   const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-//   const sut = new FacebookAuthentication(loadFacebookUserApi)
+//   const LoadFacebookUser = mock<LoadFacebookUser>()
+//   const sut = new FacebookAuthentication(LoadFacebookUser)
 //   return {
 //     sut,
-//     loadFacebookUserApi
+//     LoadFacebookUser
 //   }
 // }
 
 jest.mock('@/domain/entities/facebook_account')
 
 describe('FacebookAuthentication', () => {
-  let facebookApi: MockProxy<LoadFacebookUserApi>
+  let facebookApi: MockProxy<LoadFacebookUser>
   let crypto: MockProxy<TokenGenerator>
-  let userAccountRepo: MockProxy<LoadUserAccountRepository & SaveFacebookAccountRepository>
+  let userAccountRepo: MockProxy<LoadUserAccount & SaveFacebookAccount>
   let sut: FacebookAuthentication
   let token: string
 
@@ -53,7 +52,7 @@ describe('FacebookAuthentication', () => {
     userAccountRepo.load.mockResolvedValue(undefined)
     userAccountRepo.saveWithFacebook.mockResolvedValue({ id: 'any_account_id' })
     crypto = mock()
-    crypto.generateToken.mockResolvedValue('any_generated_token')
+    crypto.generate.mockResolvedValue('any_generated_token')
   })
 
   beforeEach(() => {
@@ -63,47 +62,47 @@ describe('FacebookAuthentication', () => {
       crypto
     )
   })
-  test('should call LoadFacebookUserApi with correct params', async () => {
-    // const loadFacebookUserApi = new LoadFacebookUserApiSpy()
-    // const loadFacebookUserApi = {
+  test('should call LoadFacebookUser with correct params', async () => {
+    // const LoadFacebookUser = new LoadFacebookUserSpy()
+    // const LoadFacebookUser = {
     //   loadUser: jest.fn()
     // }
-    // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-    // const sut = new FacebookAuthentication(loadFacebookUserApi)
-    // const {sut, loadFacebookUserApi} = makeSut()
+    // const LoadFacebookUser = mock<LoadFacebookUser>()
+    // const sut = new FacebookAuthentication(LoadFacebookUser)
+    // const {sut, LoadFacebookUser} = makeSut()
 
     await sut({token})
 
     expect(facebookApi.loadUser).toHaveBeenCalledWith({ token })
     expect(facebookApi.loadUser).toHaveBeenCalledTimes(1)
-    // expect(loadFacebookUserApi.token).toBe('any_token')
-    // expect(loadFacebookUserApi.callsCount).toBe(1)
+    // expect(LoadFacebookUser.token).toBe('any_token')
+    // expect(LoadFacebookUser.callsCount).toBe(1)
   })
 
-  test('should throw AuthenticationError when loadFacebookUserApi returns undefined', async () => {
-    // const loadFacebookUserApi = new LoadFacebookUserApiSpy()
-    // const loadFacebookUserApi = {
+  test('should throw AuthenticationError when LoadFacebookUser returns undefined', async () => {
+    // const LoadFacebookUser = new LoadFacebookUserSpy()
+    // const LoadFacebookUser = {
     //   loadUser: jest.fn()
     // }
-    // const loadFacebookUserApi = mock<LoadFacebookUserApi>()
-    // const {sut, loadFacebookUserApi} = makeSut()
-    // loadFacebookUserApi.result = undefined
+    // const LoadFacebookUser = mock<LoadFacebookUser>()
+    // const {sut, LoadFacebookUser} = makeSut()
+    // LoadFacebookUser.result = undefined
     facebookApi.loadUser.mockResolvedValueOnce(undefined)
-    // const sut = new FacebookAuthentication(loadFacebookUserApi)
+    // const sut = new FacebookAuthentication(LoadFacebookUser)
 
     const promise = sut({token})
 
     await expect(promise).rejects.toThrow(new AuthenticationError)
   })
 
-  test('should call LoadUserAccountRepo when LoadFacebookUserApi returns data', async () => {
+  test('should call LoadUserAccountRepo when LoadFacebookUser returns data', async () => {
     await sut({token})
 
     expect(userAccountRepo.load).toHaveBeenCalledWith({ email: 'any_fb_email'})
     expect(userAccountRepo.load).toHaveBeenCalledTimes(1)
   })
 
-  test('should call SaveFacebookAccountRepository with FacebookAccount', async () => {
+  test('should call SaveFacebookAccount with FacebookAccount', async () => {
     const FacebookAccountStub = jest.fn().mockImplementation(() => ({ any: 'any'}))
     jest.mocked(FacebookAccount).mockImplementation(FacebookAccountStub)
     await sut({token})
@@ -115,11 +114,11 @@ describe('FacebookAuthentication', () => {
   test('should call TokenGenerator with correct params', async () => {
     await sut({token})
 
-    expect(crypto.generateToken).toHaveBeenCalledWith({
+    expect(crypto.generate).toHaveBeenCalledWith({
       key: 'any_account_id',
       expirationInMs: AccessToken.expirationInMs
     })
-    expect(crypto.generateToken).toHaveBeenCalledTimes(1)
+    expect(crypto.generate).toHaveBeenCalledTimes(1)
   })
 
   test('should return an AccessToken on success', async () => {
@@ -128,7 +127,7 @@ describe('FacebookAuthentication', () => {
     expect(authResult).toEqual({ accessToken: 'any_generated_token' })
   })
 
-  test('should rethrow if LoadFacebookUserApi throws', async () => {
+  test('should rethrow if LoadFacebookUser throws', async () => {
     facebookApi.loadUser.mockRejectedValueOnce(new Error('fb_error'))
 
     const promise = sut({token})
@@ -136,7 +135,7 @@ describe('FacebookAuthentication', () => {
     await expect(promise).rejects.toThrow(new Error('fb_error'))
   })
 
-  test('should rethrow if LoadUserAccountRepository throws', async () => {
+  test('should rethrow if LoadUserAccount throws', async () => {
     userAccountRepo.load.mockRejectedValueOnce(new Error('load_error'))
 
     const promise = sut({token})
@@ -144,7 +143,7 @@ describe('FacebookAuthentication', () => {
     await expect(promise).rejects.toThrow(new Error('load_error'))
   })
 
-  test('should rethrow if SaveFacebookAccountRepository throws', async () => {
+  test('should rethrow if SaveFacebookAccount throws', async () => {
     userAccountRepo.saveWithFacebook.mockRejectedValueOnce(new Error('save_error'))
 
     const promise = sut({token})
@@ -153,7 +152,7 @@ describe('FacebookAuthentication', () => {
   })
 
   test('should rethrow if TokenGenerator throws', async () => {
-    crypto.generateToken.mockRejectedValueOnce(new Error('token_error'))
+    crypto.generate.mockRejectedValueOnce(new Error('token_error'))
 
     const promise = sut({token})
 

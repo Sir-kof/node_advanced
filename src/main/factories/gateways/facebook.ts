@@ -1,4 +1,4 @@
-import { FacebookApi } from '@/infra/apis'
+import { FacebookApi } from '@/infra/gateways'
 import { env } from '../../config/env'
 import { makeAxiosHttpClient } from '@/main/factories/http'
 

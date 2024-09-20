@@ -1,12 +1,12 @@
 import "reflect-metadata";
-import { LoadUserAccountRepository } from "@/domain/contracts/repos"
+import { LoadUserAccount } from "@/domain/contracts/repos"
 
 // import { DataSource } from "typeorm"
 // import { PgUser } from "@/infra/postgres/entities/pguser";
 import { AppDataSource } from "../../../../src/ormconfig";
 
 class PgUserAccountRepository {
-  async load(params: LoadUserAccountRepository.Params): Promise<void> {
+  async load(params: LoadUserAccount.Params): Promise<void> {
     // console.log('|||||||||||||||||||||||||||')
     // console.log('|||||||||||||||||||||||||||')
     // console.log('|||||||||||||||||||||||||||')
