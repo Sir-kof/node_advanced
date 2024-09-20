@@ -6,7 +6,7 @@ import { LoadUserAccount } from "@/domain/contracts/repos"
 import { AppDataSource } from "../../../../src/ormconfig";
 
 class PgUserAccountRepository {
-  async load(params: LoadUserAccount.Params): Promise<void> {
+  async load(params: LoadUserAccount.Input): Promise<void> {
     // console.log('|||||||||||||||||||||||||||')
     // console.log('|||||||||||||||||||||||||||')
     // console.log('|||||||||||||||||||||||||||')

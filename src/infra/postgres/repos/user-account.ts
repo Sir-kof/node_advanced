@@ -2,13 +2,13 @@ import { LoadUserAccount, SaveFacebookAccount } from '@/domain/contracts/repos'
 import { PgUser } from '@/infra/postgres/entities'
 import {AppDataSource} from '../../../ormconfig'
 
-type LoadParams = LoadUserAccount.Params
-type LoadResult = LoadUserAccount.Result
-type SaveParams = SaveFacebookAccount.Params
-type SaveResult = SaveFacebookAccount.Result
+type LoadInput = LoadUserAccount.Input
+type LoadOutput = LoadUserAccount.Output
+type SaveInput = SaveFacebookAccount.Input
+type SaveOutput = SaveFacebookAccount.Output
 
 export class PgUserAccountRepository implements LoadUserAccount, SaveFacebookAccount {
-  async load ({ email }: LoadParams): Promise<LoadResult> {
+  async load ({ email }: LoadInput): Promise<LoadOutput> {
     const dataUser = await AppDataSource
         .getRepository(PgUser)
         .createQueryBuilder('users')
@@ -24,7 +24,7 @@ export class PgUserAccountRepository implements LoadUserAccount, SaveFacebookAcc
     }
   }
 
-  async saveWithFacebook ({ id, name, email, facebookId }: SaveParams): Promise<SaveResult> {
+  async saveWithFacebook ({ id, name, email, facebookId }: SaveInput): Promise<SaveOutput> {
     try {
       const responseUser = await AppDataSource
         .createQueryBuilder()
