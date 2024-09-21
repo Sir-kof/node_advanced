@@ -1,4 +1,4 @@
-import { HttpGetClient } from "@/infra/http"
+import { HttpGetClient } from "@/infra/gateways"
 import { LoadFacebookUser } from "@/domain/contracts/gateways"
 
 type AppToken = {
@@ -34,12 +34,12 @@ export class FacebookApi implements LoadFacebookUser {
       // console.log(await this.getUserInfo(params.token))
       return this.getUserInfo(token)
         .then(userInfo => {
-          console.log('email',userInfo.email)
-          console.log(userInfo)
+          // console.log('email',userInfo.email)
+          // console.log(userInfo)
           return { facebookId: userInfo.facebookId, name: userInfo.name, email: userInfo.email }
       })
         .catch((e) => {
-          console.error('retornou erro ao chamar', e)
+          // console.error('retornou erro ao chamar', e)
           return undefined
         })
       // return {

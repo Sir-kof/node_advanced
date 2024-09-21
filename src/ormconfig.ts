@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   database: 'oni',
   synchronize: true,
   logging: false,
-  entities: ['src/infra/postgres/entities/**/*{.ts,.js}'],
-  migrations: ['src/infra/postgres/migrations/**/*{.ts,.js}'],
+  entities: ['src/infra/repos/postgres/entities/**/*{.ts,.js}'],
+  migrations: ['src/infra/repos/postgres/migrations/**/*{.ts,.js}'],
   subscribers: []
 })

@@ -1,4 +1,4 @@
-import { PgUserAccountRepository } from '@/infra/postgres/repos/user-account'
+import { PgUserAccountRepository } from '@/infra/repos'
 
 export const makePgUserAccountRepo = (): PgUserAccountRepository => {
   return new PgUserAccountRepository()
