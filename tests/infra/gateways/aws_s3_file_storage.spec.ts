@@ -35,25 +35,25 @@ describe('AwsS3FileStorage', () => {
   describe('upload', () => {
     let file: Buffer
     let putObjectPromiseSpy: jest.Mock
-    let puObjectSpy: jest.Mock
+    let putObjectSpy: jest.Mock
 
     beforeAll(() => {
       file = Buffer.from('any_buffer')
       putObjectPromiseSpy = jest.fn()
-      puObjectSpy = jest.fn().mockImplementation(() => ({ promise: putObjectPromiseSpy }))
-      jest.mocked(S3).mockImplementation(jest.fn().mockImplementation(() => ({ putObject: puObjectSpy })))
+      putObjectSpy = jest.fn().mockImplementation(() => ({ promise: putObjectPromiseSpy }))
+      jest.mocked(S3).mockImplementation(jest.fn().mockImplementation(() => ({ putObject: putObjectSpy })))
     })
 
     test('should call putObject with correct input', async () => {
       await sut.upload({ key, file })
 
-      expect(puObjectSpy).toHaveBeenCalledWith({
+      expect(putObjectSpy).toHaveBeenCalledWith({
         Bucket: bucket,
         Key: key,
         Body: file,
         ACL: 'public-read',
       })
-      expect(puObjectSpy).toHaveBeenCalledTimes(1)
+      expect(putObjectSpy).toHaveBeenCalledTimes(1)
       expect(putObjectPromiseSpy).toHaveBeenCalledTimes(1)
     })
 
@@ -79,4 +79,25 @@ describe('AwsS3FileStorage', () => {
     })
   })
 
+  describe('delete', () => {
+    let deleteObjectPromiseSpy: jest.Mock
+    let deleteObjectSpy: jest.Mock
+
+    beforeAll(() => {
+      deleteObjectPromiseSpy = jest.fn()
+      deleteObjectSpy = jest.fn().mockImplementation(() => ({ promise: deleteObjectPromiseSpy }))
+      jest.mocked(S3).mockImplementation(jest.fn().mockImplementation(() => ({ deleteObject: deleteObjectSpy })))
+    })
+
+    test('should call deleteObject with correct input', async () => {
+      await sut.delete({ key })
+
+      expect(deleteObjectSpy).toHaveBeenCalledWith({
+        Bucket: bucket,
+        Key: key,
+      })
+      expect(deleteObjectSpy).toHaveBeenCalledTimes(1)
+      expect(deleteObjectPromiseSpy).toHaveBeenCalledTimes(1)
+    })
+  })
 })
