@@ -1,4 +1,5 @@
 export * from './validator'
+export * from './allowed_mime_types'
 export * from './composite'
 export * from './builder'
 export * from './required'
