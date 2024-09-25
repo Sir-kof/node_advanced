@@ -16,7 +16,7 @@ export class SavePictureController extends Controller {
     // if (file.buffer.length === 0) return badRequest(new RequiredFieldError('file'))
     // if (!['image/png', 'image/jpg', 'image/jpeg'].includes(file.mimeType)) return badRequest(new InvalidMimeTypeError(['png', 'jpeg']))
     // if (file.buffer.length > 5 * 1024 * 1024) return badRequest(new MaxFileSizeError(5))
-    const data = await this.changeProfilePicture({ id: userId, file: file.buffer })
+    const data = await this.changeProfilePicture({ id: userId, file })
     return ok(data)
   }
 
