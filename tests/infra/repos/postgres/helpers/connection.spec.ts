@@ -21,18 +21,29 @@ class PgConnection {
 }
 
 describe('PgConnection', () => {
+  let initializeSpy: jest.Mock
+  let createQueryRunnerSpy: jest.Mock
+  let sut: PgConnection
+
+
+  beforeAll(() => {
+    initializeSpy = jest.fn()
+    createQueryRunnerSpy = jest.fn()
+    jest.mocked(initializeConnection).mockImplementation(initializeSpy)
+    jest.mocked(createQueryRunner).mockImplementation(createQueryRunnerSpy)
+  })
+
+  beforeEach(() => {
+    sut = PgConnection.getInstance()
+  })
+
   test('should have only one instance', () => {
-    const sut = PgConnection.getInstance()
     const sut2 = PgConnection.getInstance()
 
     expect(sut).toBe(sut2)
   })
 
   test('should initialize DB instance', async () => {
-    const initializeSpy = jest.fn()
-    jest.mocked(initializeConnection).mockImplementationOnce(initializeSpy)
-    const sut = PgConnection.getInstance()
-
     await sut.initialize()
 
     expect(initializeSpy).toHaveBeenCalled();
@@ -40,10 +51,6 @@ describe('PgConnection', () => {
   })
 
   test('should create query runner', async () => {
-    const createQueryRunnerSpy = jest.fn()
-    jest.mocked(createQueryRunner).mockImplementationOnce(createQueryRunnerSpy)
-    const sut = PgConnection.getInstance()
-
     await sut.createQueryRunner()
 
     expect(createQueryRunnerSpy).toHaveBeenCalled();
