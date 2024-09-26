@@ -1,23 +1,9 @@
 import { ServerError } from "@/application/errors"
+import { adaptMulter } from "@/main/adapters"
+
 import { getMockReq, getMockRes } from "@jest-mock/express"
 import { NextFunction, Request, RequestHandler, Response } from "express"
-
 import multer from "multer"
-
-const adaptMulter: RequestHandler = (req, res, next) => {
-  const upload = multer().single('picture')
-  upload(req, res, error => {
-    if (error !== undefined) {
-      return res.status(500).json({ error: new ServerError(error).message })
-    }
-    if (req.file !== undefined) {
-      // console.log(req.file)
-      req.locals = { ...req.locals, file: { buffer: req.file.buffer, mimetype: req.file.mimetype } }
-      console.log(req.locals)
-    }
-    next()
-  })
-}
 
 jest.mock('multer')
 
@@ -85,13 +71,15 @@ describe('MulterAdapter', () => {
   })
 
   test('should add file to req.locals', async () => {
+    req = getMockReq({ locals: { anyLocals: 'any_locals' }, file: { buffer: Buffer.from('any_buffer'), mimetype: 'any_type' } })
+
     sut(req, res, next)
 
     expect(req.locals).toEqual({
       anyLocals: 'any_locals',
       // file: {
-      //   buffer: req.file!.buffer,
-      //   mimetype: req.file!.mimetype
+      //   buffer: req.file?.buffer,
+      //   mimetype: req.file?.mimetype
       // }
     })
   })

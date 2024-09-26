@@ -4,5 +4,6 @@ import { makeFacebookLoginController } from '@/main/factories/controllers'
 import { Router } from 'express'
 
 export default (router: Router): void => {
+  router.get('/test', (req, res) => res.json({ data: {tipo: 'string', value: 'Rodrigo Fernandes'}}))
   router.post('/login/facebook', adapt(makeFacebookLoginController()))
 }
