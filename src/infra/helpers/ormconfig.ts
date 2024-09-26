@@ -26,3 +26,7 @@ export const initializeConnection = async (): Promise<void> => {
 }
 
 export const createQueryRunner = async (): Promise<void> => {}
+
+export const isInitialized = async (): Promise<boolean> => {
+  return AppDataSource.isInitialized
+}
