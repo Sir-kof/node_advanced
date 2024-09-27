@@ -7,6 +7,9 @@ describe('PgConnection', () => {
   let isInitializedSpy: jest.Mock
   let startTransactionSpy: jest.Mock
   let createQueryRunnerSpy: jest.Mock
+  let releaseSpy: jest.Mock
+  let commitTransactionSpy: jest.Mock
+  let rollbackTransactionSpy: jest.Mock
   let sut: PgConnection
 
 
@@ -14,8 +17,14 @@ describe('PgConnection', () => {
     initializeSpy = jest.fn()
     isInitializedSpy = jest.fn().mockReturnValue(true)
     startTransactionSpy = jest.fn()
+    releaseSpy = jest.fn()
+    commitTransactionSpy = jest.fn()
+    rollbackTransactionSpy = jest.fn()
     createQueryRunnerSpy = jest.fn().mockReturnValue({
-      startTransaction: startTransactionSpy
+      startTransaction: startTransactionSpy,
+      release: releaseSpy,
+      commitTransaction: commitTransactionSpy,
+      rollbackTransaction: rollbackTransactionSpy
     })
     jest.mocked(initialize).mockImplementation(initializeSpy)
     jest.mocked(isInitialized).mockImplementation(isInitializedSpy)
@@ -53,5 +62,26 @@ describe('PgConnection', () => {
 
     expect(startTransactionSpy).toHaveBeenCalledWith();
     expect(startTransactionSpy).toHaveBeenCalledTimes(1);
+  })
+
+  test('should close transaction', async () => {
+    await sut.closeTransaction()
+
+    expect(releaseSpy).toHaveBeenCalledWith();
+    expect(releaseSpy).toHaveBeenCalledTimes(1);
+  })
+
+  test('should commit transaction', async () => {
+    await sut.commit()
+
+    expect(commitTransactionSpy).toHaveBeenCalledWith();
+    expect(commitTransactionSpy).toHaveBeenCalledTimes(1);
+  })
+
+  test('should rollback transaction', async () => {
+    await sut.rollback()
+
+    expect(rollbackTransactionSpy).toHaveBeenCalledWith();
+    expect(rollbackTransactionSpy).toHaveBeenCalledTimes(1);
   })
 })
