@@ -1,14 +1,16 @@
 import { LoadUserAccount, SaveFacebookAccount } from '@/domain/contracts/repos'
 import { PgUser } from '@/infra/repos/postgres/entities'
-import {AppDataSource} from '@/ormconfig'
+import {AppDataSource} from '@/infra/config'
+import { PgRepository } from './repository'
 
 type LoadInput = LoadUserAccount.Input
 type LoadOutput = LoadUserAccount.Output
 type SaveInput = SaveFacebookAccount.Input
 type SaveOutput = SaveFacebookAccount.Output
 
-export class PgUserAccountRepository implements LoadUserAccount, SaveFacebookAccount {
+export class PgUserAccountRepository extends PgRepository implements LoadUserAccount, SaveFacebookAccount {
   async load ({ email }: LoadInput): Promise<LoadOutput> {
+    const pgUserRepo = this.getRepository(PgUser)
     const dataUser = await AppDataSource
         .getRepository(PgUser)
         .createQueryBuilder('users')
