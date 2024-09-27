@@ -14,12 +14,12 @@ export class DbTransactionController {
     try {
       const httpResponse = await this.decoratee.perform(httpRequest)
       await this.db.commit()
-      await this.db.closeTransaction()
       return httpResponse
     } catch (error) {
       await this.db.rollback()
-      await this.db.closeTransaction()
       throw error
+    } finally {
+      await this.db.closeTransaction()
     }
   }
 }
@@ -88,7 +88,7 @@ describe('DbTransactionController', () => {
     expect(httpResponse).toEqual({ statusCode: 204, data: null })
   })
 
-  test('should rethrow is decoratee throws', async () => {
+  test('should rethrow if decoratee throws', async () => {
     const error = new Error('decoratee_error')
     decoratee.perform.mockRejectedValueOnce(error)
 
