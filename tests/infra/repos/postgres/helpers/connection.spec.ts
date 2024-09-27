@@ -1,3 +1,4 @@
+import { PgUser } from "@/infra/repos/postgres/entities";
 import { ConnectionNotFoundError, createQueryRunner, initialize, isInitialized, PgConnection } from "@/infra/repos/postgres/helpers";
 
 jest.mock("@/infra/repos/postgres/helpers/ormconfig_helper");
@@ -10,6 +11,7 @@ describe('PgConnection', () => {
   let releaseSpy: jest.Mock
   let commitTransactionSpy: jest.Mock
   let rollbackTransactionSpy: jest.Mock
+  let getRepositorySpy: jest.Mock
   let sut: PgConnection
 
 
@@ -20,11 +22,13 @@ describe('PgConnection', () => {
     releaseSpy = jest.fn()
     commitTransactionSpy = jest.fn()
     rollbackTransactionSpy = jest.fn()
+    getRepositorySpy = jest.fn().mockReturnValue('any_repo')
     createQueryRunnerSpy = jest.fn().mockReturnValue({
       startTransaction: startTransactionSpy,
       release: releaseSpy,
       commitTransaction: commitTransactionSpy,
-      rollbackTransaction: rollbackTransactionSpy
+      rollbackTransaction: rollbackTransactionSpy,
+      manager: { getRepository: getRepositorySpy }
     })
     jest.mocked(initialize).mockImplementation(initializeSpy)
     jest.mocked(isInitialized).mockImplementation(isInitializedSpy)
@@ -83,5 +87,13 @@ describe('PgConnection', () => {
 
     expect(rollbackTransactionSpy).toHaveBeenCalledWith();
     expect(rollbackTransactionSpy).toHaveBeenCalledTimes(1);
+  })
+
+  test('should get repository', async () => {
+    const repository = sut.getRepository(PgUser)
+
+    expect(getRepositorySpy).toHaveBeenCalledWith(PgUser);
+    expect(getRepositorySpy).toHaveBeenCalledTimes(1);
+    expect(repository).toBe('any_repo');
   })
 })
