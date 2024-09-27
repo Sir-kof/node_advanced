@@ -1,3 +1,5 @@
 export * from './facebook'
 export * from './jwt_token'
 export * from './axios_client'
+export * from './file_storage'
+export * from './uuid'

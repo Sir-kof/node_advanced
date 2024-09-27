@@ -1,7 +1,7 @@
 import { LoadUserAccount, SaveFacebookAccount } from '@/domain/contracts/repos'
 import { PgUser } from '@/infra/repos/postgres/entities'
 import {AppDataSource} from '@/infra/config'
-import { PgRepository } from './repository'
+import { PgRepository } from '../repository'
 
 type LoadInput = LoadUserAccount.Input
 type LoadOutput = LoadUserAccount.Output

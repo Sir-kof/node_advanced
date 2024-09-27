@@ -1,1 +1,2 @@
-export * from './pg_user_account'
+export * from './user-account'
+export * from './user-profile'
