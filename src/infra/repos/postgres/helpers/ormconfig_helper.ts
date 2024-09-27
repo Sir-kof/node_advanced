@@ -1,4 +1,5 @@
 import { AppDataSource } from "@/infra/config"
+import { QueryRunner } from "typeorm"
 
 export const isInitialized = async (): Promise<boolean> => {
   return AppDataSource.isInitialized
@@ -14,6 +15,10 @@ export const initialize = async (): Promise<void> => {
         })
 }
 
-export const createQueryRunner = async (): Promise<void> => {
-  await AppDataSource.createQueryRunner()
+export const createQueryRunner = async (): Promise<QueryRunner> => {
+  return AppDataSource.createQueryRunner()
+}
+
+export const destroyConnection = async (): Promise<void> => {
+  await AppDataSource.destroy()
 }

@@ -1,7 +1,10 @@
-import { createQueryRunner, initialize, isInitialized } from "@/infra/repos/postgres/helpers"
+import { ConnectionNotFoundError, createQueryRunner, destroyConnection, initialize, isInitialized } from "@/infra/repos/postgres/helpers"
+import { QueryRunner } from "typeorm"
 
 export class PgConnection {
   private static instance?: PgConnection
+  private query?: QueryRunner
+
   private constructor () {}
 
   static getInstance (): PgConnection {
@@ -16,6 +19,15 @@ export class PgConnection {
   }
 
   async createQueryRunner (): Promise<void> {
-    await createQueryRunner()
+    this.query = await createQueryRunner()
+  }
+
+  async openTransaction (): Promise<void> {
+    if (this.query === undefined) throw new ConnectionNotFoundError()
+    await this.query?.startTransaction()
+  }
+
+  async destroy (): Promise<void> {
+    await destroyConnection()
   }
 }
