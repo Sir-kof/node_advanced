@@ -1,6 +1,7 @@
 import { DeleteFile, UploadFile } from "@/domain/contracts/gateways"
 
 import { config, S3 } from "aws-sdk"
+require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 
 export class AwsS3FileStorage implements UploadFile, DeleteFile {
   constructor (accessKey: string, secret: string, private readonly bucket: string) {

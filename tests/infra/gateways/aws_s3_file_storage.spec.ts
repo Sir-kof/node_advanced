@@ -1,6 +1,7 @@
 import { AwsS3FileStorage } from "@/infra/gateways"
 
 import { config, S3 } from "aws-sdk"
+require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 
 jest.mock('aws-sdk')
 
