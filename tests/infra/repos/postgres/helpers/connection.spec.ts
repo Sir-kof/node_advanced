@@ -1,26 +1,6 @@
-import { initializeConnection, createQueryRunner, isInitialized } from "@/infra/helpers"
+import { createQueryRunner, initialize, isInitialized, PgConnection } from "@/infra/repos/postgres/helpers";
 
-jest.mock("@/infra/helpers");
-
-class PgConnection {
-  private static instance?: PgConnection
-  private constructor () {}
-
-  static getInstance (): PgConnection {
-    if (PgConnection.instance === undefined) PgConnection.instance = new PgConnection()
-    return PgConnection.instance
-  }
-
-  async initialize (): Promise<void> {
-    if (await isInitialized() === false) {
-      await initializeConnection()
-    }
-  }
-
-  async createQueryRunner (): Promise<void> {
-    await createQueryRunner()
-  }
-}
+jest.mock("@/infra/repos/postgres/helpers/ormconfig_helper");
 
 describe('PgConnection', () => {
   let initializeSpy: jest.Mock
@@ -33,7 +13,7 @@ describe('PgConnection', () => {
     initializeSpy = jest.fn()
     isInitializedSpy = jest.fn().mockReturnValue(true)
     createQueryRunnerSpy = jest.fn()
-    jest.mocked(initializeConnection).mockImplementation(initializeSpy)
+    jest.mocked(initialize).mockImplementation(initializeSpy)
     jest.mocked(isInitialized).mockImplementation(isInitializedSpy)
     jest.mocked(createQueryRunner).mockImplementation(createQueryRunnerSpy)
   })

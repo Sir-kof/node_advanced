@@ -3,7 +3,7 @@ import { LoadUserAccount } from "@/domain/contracts/repos"
 
 // import { DataSource } from "typeorm"
 // import { PgUser } from "@/infra/postgres/entities/pguser";
-import { AppDataSource } from "@/infra/helpers/ormconfig";
+// import { AppDataSource } from "@/infra/helpers/ormconfig";
 
 class PgUserAccountRepository {
   async load(params: LoadUserAccount.Input): Promise<void> {
