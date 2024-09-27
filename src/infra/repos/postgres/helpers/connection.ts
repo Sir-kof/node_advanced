@@ -1,9 +1,10 @@
-import { ConnectionNotFoundError, createQueryRunner, destroyConnection, initialize, isInitialized } from "@/infra/repos/postgres/helpers"
+import { ConnectionNotFoundError, createQueryRunner, destroyConnection, initialize, isInitialized, TransactionNotFoundError } from "@/infra/repos/postgres/helpers"
 import { QueryRunner, Repository, ObjectType, ObjectLiteral } from "typeorm"
 
 export class PgConnection {
   private static instance?: PgConnection
   private query?: QueryRunner
+  private connection: boolean = false
 
   private constructor () {}
 
@@ -15,6 +16,7 @@ export class PgConnection {
   async initialize (): Promise<void> {
     if (await isInitialized() === false) {
       await initialize()
+      this.connection = true
     }
   }
 
@@ -23,22 +25,23 @@ export class PgConnection {
   }
 
   async openTransaction (): Promise<void> {
-    if (this.query === undefined) throw new ConnectionNotFoundError()
-    await this.query.startTransaction()
+    if (this.connection === false) throw new ConnectionNotFoundError()
+    this.query = await createQueryRunner()
+    await this.query?.startTransaction()
   }
 
   async closeTransaction (): Promise<void> {
-    if (this.query === undefined) throw new ConnectionNotFoundError()
+    if (this.query === undefined) throw new TransactionNotFoundError()
     await this.query.release()
   }
 
   async commit (): Promise<void> {
-    if (this.query === undefined) throw new ConnectionNotFoundError()
+    if (this.query === undefined) throw new TransactionNotFoundError()
     await this.query.commitTransaction()
   }
 
   async rollback (): Promise<void> {
-    if (this.query === undefined) throw new ConnectionNotFoundError()
+    if (this.query === undefined) throw new TransactionNotFoundError()
     await this.query.rollbackTransaction()
   }
 
